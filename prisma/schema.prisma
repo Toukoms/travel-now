@@ -38,6 +38,7 @@ model User {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
   name           String?
   firstName      String?
+  cin            String    @unique
   email          String?   @unique
   emailVerified  DateTime?
   image          String?
@@ -46,6 +47,9 @@ model User {
   hashedPassword String?
   accounts       Account[]
   sessions       Session[]
+
+  travelIds String[] @db.ObjectId
+  travels   Travel[] @relation(fields: [travelIds], references: [id])
 }
 
 model VerificationToken {
@@ -55,4 +59,18 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Travel {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  departure      String
+  arrival        String
+  departureDate  DateTime
+  cooperative    String
+  price          Int
+  maxPlace       Int
+  avalaiblePlace Int
+
+  passengerIds String[] @db.ObjectId
+  passengers   User[]   @relation(fields: [passengerIds], references: [id])
 }

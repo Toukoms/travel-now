@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 type UserProps = {
   name: string;
   firstName: string;
+  cin: string;
   email: string;
   password: string;
 };
@@ -17,6 +18,7 @@ const AuthPage = () => {
   const [user, setUser] = useState<UserProps>({
     name: "",
     firstName: "",
+    cin: "",
     email: "",
     password: "",
   });
@@ -47,7 +49,8 @@ const AuthPage = () => {
         user.email,
         user.password,
         user.name,
-        user.firstName
+        user.firstName,
+        user.cin
       )!;
       setError(validation);
       if (!validation && validation.length === 0) {
@@ -99,7 +102,6 @@ const AuthPage = () => {
             <label htmlFor="name" className="flex flex-col mb-2">
               Nom :
               <input
-                required
                 type="text"
                 value={user?.name}
                 onChange={(event) =>
@@ -114,7 +116,6 @@ const AuthPage = () => {
             <label htmlFor="first-name" className="flex flex-col mb-2">
               Prénom :
               <input
-                required
                 type="text"
                 value={user?.firstName}
                 onChange={(event) =>
@@ -127,6 +128,24 @@ const AuthPage = () => {
                 id="first-name"
                 className="bg-gray-200 border border-slate-700 px-2 pt-2 pb-1 rounded-sm focus:outline-none"
                 placeholder="Prénom"
+              />
+            </label>
+            <label htmlFor="cin" className="flex flex-col mb-2">
+              CIN :
+              <input
+                required
+                type="text"
+                value={user?.cin}
+                onChange={(event) =>
+                  setUser({
+                    ...user,
+                    cin: event.target.value,
+                  } as UserProps)
+                }
+                name="cin"
+                id="cin"
+                className="bg-gray-200 border border-slate-700 px-2 pt-2 pb-1 rounded-sm focus:outline-none"
+                placeholder="Carte d'Identité Nationale"
               />
             </label>
           </>
@@ -169,6 +188,7 @@ const AuthPage = () => {
 
         {/* Submit button */}
         <button
+          disabled={loading}
           type="submit"
           className="w-full p-3 rounded-md my-4 bg-slate-700 focus:bg-slate-600 hover:bg-slate-500 text-white"
         >
