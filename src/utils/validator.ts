@@ -52,21 +52,54 @@ export function isPasswordValid(password: string) {
 }
 
 export function isNameValid(name: string) {
-  // Only letters (no numbers or special characters)
+  // Must be more than tree characters
   if (name.length < 3) return false;
 
+  // Only letters (no numbers or special characters)
   const namePattern = /^[A-Za-z\s]+$/;
   return namePattern.test(name);
+}
+
+export function isCINValid(cin: string) {
+  // Number of characters in CIN must be equal to 12
+  if (cin.length !== 12) return false;
+
+  // Only numbers
+  const cinPattern = /^[0-9]+$/;
+  return cinPattern.test(cin);
+}
+
+export function isTelNumberValid(telNumber: string) {
+  // Number of characters in telNumber must be equal to 10
+  if (telNumber.length !== 10) return false;
+
+  // Only numbers
+  const telNumberPattern = /^[0-9]+$/;
+  return telNumberPattern.test(telNumber);
 }
 
 export function isSignUpValid(
   email: string,
   password: string,
   name: string,
-  firstName: string
+  firstName: string,
+  cin: string,
+  telNumber: string
 ) {
   if (!isNameValid(name) || !isNameValid(firstName)) {
     return "Nom et prénom devraient être au moins trois caractères et seulement des lettres.";
+  }
+
+  if (name.length === 0 && firstName.length === 0) {
+    return "Veuillez mettre votre nom et/ou votre prénom.";
+  }
+
+  if (!isCINValid(cin)) {
+    return "Veuillez mettre un nunméro d'identité nationale valide.";
+  }
+
+  if (!isTelNumberValid(telNumber)) {
+    return "Veuillez mettre un nunméro de téléphone valide.";
   }
 
   if (!isEmailValid(email)) {

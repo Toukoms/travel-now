@@ -35,17 +35,21 @@ model Session {
 }
 
 model User {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
   name           String?
   firstName      String?
-  email          String?   @unique
+  telNumber      String
+  cin            String        @unique
+  email          String?       @unique
   emailVerified  DateTime?
   image          String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   hashedPassword String?
+  reservation    Reservation[]
   accounts       Account[]
   sessions       Session[]
+  isAdmin        Boolean       @default(false)
 }
 
 model VerificationToken {
@@ -55,4 +59,31 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Reservation {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  nbPlace     Int
+  totalPrice  Int
+  expireAfter DateTime
+  travelId    String   @db.ObjectId
+  travel      Travel   @relation(fields: [travelId], references: [id])
+}
+
+model Travel {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  departure      String
+  arrival        String
+  departureDate  String
+  departureTime  String
+  cooperative    String
+  price          Int
+  maxPlace       Int
+  availablePlace Int
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  expireAfter    DateTime
+  Reservation    Reservation[]
 }

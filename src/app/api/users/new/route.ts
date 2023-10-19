@@ -7,7 +7,8 @@ import { User } from "@prisma/client";
 export async function POST(request: Request) {
   const res = NextResponse;
   try {
-    const { name, firstName, email, password } = await request.json();
+    const { name, firstName, cin, telNumber, email, password } =
+      await request.json();
 
     prismaClient.$connect();
     const userAlreadyExist = await prismaClient.user.findUnique({
@@ -22,12 +23,32 @@ export async function POST(request: Request) {
       });
     }
 
+    const userSameCIN = await prismaClient.user.findUnique({
+      where: {
+        cin: cin,
+      },
+    });
+
+    if (userSameCIN) {
+      return res.json(
+        {
+          code: "ERR_USER_ALREADY_EXISTS",
+          message: "User with this CIN already exist.",
+        },
+        {
+          status: errorResponse.ERR_USER_ALREADY_EXISTS.status,
+        }
+      );
+    }
+
     const hashedPassword = await hash(password, 12);
 
     const user = await prismaClient.user.create({
       data: {
         name,
         firstName,
+        cin,
+        telNumber,
         email,
         hashedPassword,
         image: "",
