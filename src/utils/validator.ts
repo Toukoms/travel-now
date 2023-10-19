@@ -61,12 +61,21 @@ export function isNameValid(name: string) {
 }
 
 export function isCINValid(cin: string) {
-  // Number of characters in CIN must be equal to 14
-  if (cin.length !== 14) return false;
+  // Number of characters in CIN must be equal to 12
+  if (cin.length !== 12) return false;
 
   // Only numbers
   const cinPattern = /^[0-9]+$/;
   return cinPattern.test(cin);
+}
+
+export function isTelNumberValid(telNumber: string) {
+  // Number of characters in telNumber must be equal to 10
+  if (telNumber.length !== 10) return false;
+
+  // Only numbers
+  const telNumberPattern = /^[0-9]+$/;
+  return telNumberPattern.test(telNumber);
 }
 
 export function isSignUpValid(
@@ -74,7 +83,8 @@ export function isSignUpValid(
   password: string,
   name: string,
   firstName: string,
-  cin: string
+  cin: string,
+  telNumber: string
 ) {
   if (!isNameValid(name) || !isNameValid(firstName)) {
     return "Nom et prénom devraient être au moins trois caractères et seulement des lettres.";
@@ -84,8 +94,12 @@ export function isSignUpValid(
     return "Veuillez mettre votre nom et/ou votre prénom.";
   }
 
-  if (isCINValid(cin)) {
+  if (!isCINValid(cin)) {
     return "Veuillez mettre un nunméro d'identité nationale valide.";
+  }
+
+  if (!isTelNumberValid(telNumber)) {
+    return "Veuillez mettre un nunméro de téléphone valide.";
   }
 
   if (!isEmailValid(email)) {
