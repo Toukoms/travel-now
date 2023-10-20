@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    prismaClient.$connect();
+    await prismaClient.$connect();
     const users = await prismaClient.user.findMany({
       orderBy: {
         createdAt: "desc",
@@ -19,6 +19,6 @@ export async function GET(request: NextRequest) {
     console.error(error);
     return new NextResponse("Internal Server Error", { status: 500 });
   } finally {
-    prismaClient.$disconnect();
+    await prismaClient.$disconnect();
   }
 }

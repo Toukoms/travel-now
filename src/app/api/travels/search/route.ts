@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    prismaClient.$connect();
+    await prismaClient.$connect();
     const travels = await prismaClient.travel.findMany({
       where: {
         departure: departure,
@@ -22,6 +22,9 @@ export async function POST(request: NextRequest) {
       orderBy: {
         createdAt: "asc",
       },
+      include: {
+        Reservation: true,
+      },
     });
 
     return NextResponse.json(travels || []);
@@ -29,6 +32,6 @@ export async function POST(request: NextRequest) {
     console.error(error);
     return new NextResponse("Internal Server Error", { status: 500 });
   } finally {
-    prismaClient.$disconnect();
+    await prismaClient.$disconnect();
   }
 }

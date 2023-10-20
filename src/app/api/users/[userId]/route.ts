@@ -11,7 +11,7 @@ export async function GET(
       return new NextResponse("Missing user ID", { status: 400 });
     }
 
-    prismaClient.$connect();
+    await prismaClient.$connect();
     const user = await prismaClient.user.findUniqueOrThrow({
       where: { id: userId },
     });
@@ -27,6 +27,6 @@ export async function GET(
     console.error(error);
     return new NextResponse("Internal Server Error", { status: 500 });
   } finally {
-    prismaClient.$disconnect();
+    await prismaClient.$disconnect();
   }
 }

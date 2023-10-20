@@ -1,16 +1,15 @@
 import { formatMoney } from "@/utils/moneyFormater";
 import { Travel } from "@prisma/client";
-import Link from "next/link";
 import React from "react";
 
-const CardBooking = ({
+const TravelCard = ({
   travel,
-  availablePlace,
-  reservationBtn = true,
+  nbPLace,
+  totalPrice,
 }: {
   travel: Travel;
-  availablePlace: number;
-  reservationBtn?: boolean;
+  totalPrice: number;
+  nbPLace: number;
 }) => {
   return (
     <div className="border border-slate-400 rounded-md shadow-md px-4 py-2 max-w-md">
@@ -25,28 +24,19 @@ const CardBooking = ({
           </span>
         </p>
         <p className="font-semibold text-slate-900">
-          Place disponible:{" "}
-          <span className="font-normal text-gray-600">{availablePlace}</span>
+          Place réservé:{" "}
+          <span className="font-normal text-gray-600">{nbPLace}</span>
         </p>
         <p className="font-semibold text-slate-900">
-          Fraix de transport:{" "}
+          Frais total de transport:{" "}
           <span className="font-normal text-gray-600">
-            {formatMoney(travel.price)}
+            {formatMoney(totalPrice)}
             {" MGA"}
           </span>
         </p>
       </div>
-
-      {reservationBtn && (
-        <Link
-          href={`/travel/${travel.id}`}
-          className="btn btn-new p-2 mt-2 ml-auto mb-3 shadow-sm hover:shadow-md"
-        >
-          Reserver
-        </Link>
-      )}
     </div>
   );
 };
 
-export default CardBooking;
+export default TravelCard;

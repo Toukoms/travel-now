@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       );
     }
 
-    prismaClient.$connect();
+    await prismaClient.$connect();
     const sameTravel = await prismaClient.travel.findFirst({
       where: {
         cooperative: cooperative,
@@ -68,6 +68,6 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   } finally {
-    prismaClient.$disconnect();
+    await prismaClient.$disconnect();
   }
 }

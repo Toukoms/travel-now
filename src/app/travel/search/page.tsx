@@ -2,7 +2,8 @@
 
 import CardBooking from "@/components/CardBooking";
 import { SEARCH_TRAVEL_ROUTE } from "@/routes/api.routes";
-import { Travel } from "@prisma/client";
+import { countReservations } from "@/utils/reservations";
+import { Reservation, Travel } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -22,7 +23,9 @@ const getTravelsBy = async (
         depart: depart,
       }),
     });
-    return (await res.json()) as Promise<Travel[]>;
+    return (await res.json()) as Promise<
+      (Travel & { Reservation: Reservation[] })[]
+    >;
   } catch (error) {
     console.error(error);
   }
@@ -34,7 +37,8 @@ const SearchPage = () => {
   const depart = searchParams.get("depart");
   const arrival = searchParams.get("arrival");
   const departDate = searchParams.get("departDate");
-  const [travels, setTravels] = useState<Travel[]>();
+  const [travels, setTravels] =
+    useState<(Travel & { Reservation: Reservation[] })[]>();
   const session = useSession();
 
   useEffect(() => {
@@ -60,7 +64,7 @@ const SearchPage = () => {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 place-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:mx-auto">
         {travels.length === 0 ? (
           <p className="pt-8 mx-auto text-3xl text-gray-400">
             Désolé, aucun résultat.
@@ -71,6 +75,9 @@ const SearchPage = () => {
               key={travel.id}
               travel={travel}
               reservationBtn={!session.data?.user.isAdmin}
+              availablePlace={
+                travel.maxPlace - countReservations(travel.Reservation)
+              }
             ></CardBooking>
           ))
         )}
