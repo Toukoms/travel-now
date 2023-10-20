@@ -2,13 +2,14 @@
 import CardBooking from "@/components/CardBooking";
 import { NEW_RESERVATION_ROUTE, TRAVELS_ROUTE } from "@/routes/api.routes";
 import { formatMoney } from "@/utils/moneyFormater";
-import { Travel } from "@prisma/client";
+import { countReservations } from "@/utils/reservations";
+import { Reservation, Travel } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { RiArrowLeftRightFill } from "react-icons/ri";
 
-type Reservation = {
+type ReservationForm = {
   userId: string;
   nbPlace: number;
   totalPrice: number;
@@ -22,7 +23,9 @@ const getTravelById = async (travelId: string) => {
     if (!(res.ok && res.status === 200)) {
       throw new Error(await res.json());
     }
-    return (await res.json()) as Promise<Travel>;
+    return (await res.json()) as Promise<
+      Travel & { Reservation: Reservation[] }
+    >;
   } catch (error) {
     console.error(error);
   }
@@ -44,8 +47,10 @@ const updateTravel = async (reservationId: string, travelId: string) => {
 
 const ReservaTionPage = ({ params }: { params: { travelId: string } }) => {
   const session = useSession();
-  const [travel, setTravel] = useState<Travel>();
-  const [reservation, setReservation] = useState<Reservation>({
+  const [travel, setTravel] = useState<
+    Travel & { Reservation: Reservation[] }
+  >();
+  const [reservation, setReservation] = useState<ReservationForm>({
     userId: "",
     nbPlace: 0,
     totalPrice: 0,
@@ -132,7 +137,11 @@ const ReservaTionPage = ({ params }: { params: { travelId: string } }) => {
           <h2 className="text-xl font-bold">{travel.arrival}</h2>
         </div>
       </div>
-      <CardBooking travel={travel} reservationBtn={false}></CardBooking>
+      <CardBooking
+        travel={travel}
+        reservationBtn={false}
+        availablePlace={travel.maxPlace - countReservations(travel.Reservation)}
+      ></CardBooking>
       <form className="mt-6" onSubmit={handleSubmit}>
         <h2 className="text-2xl mb-3">
           Combien de place voulez vous réserver?
@@ -151,7 +160,7 @@ const ReservaTionPage = ({ params }: { params: { travelId: string } }) => {
               setReservation({
                 ...reservation,
                 nbPlace: parseInt(event.target.value) || 0,
-              } as Reservation)
+              } as ReservationForm)
             }
             name="nb-place"
             id="nb-place"
