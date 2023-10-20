@@ -1,5 +1,5 @@
 "use client";
-import { Travel } from "@prisma/client";
+import { Reservation, Travel } from "@prisma/client";
 import Link from "next/link";
 import React, { use, useEffect, useState } from "react";
 import { MdAdd } from "react-icons/md";
@@ -7,18 +7,21 @@ import { twMerge } from "tailwind-merge";
 import DataTable, { ColumnsTableProps } from "./_components/DataTable";
 import { TRAVELS_ROUTE } from "@/routes/api.routes";
 import { formatMoney } from "@/utils/moneyFormater";
+import { countReservations } from "@/utils/reservations";
 
 const getTravels = async () => {
   try {
     const res = await fetch(TRAVELS_ROUTE, { cache: "no-cache" });
-    return res.json() as Promise<Travel[]>;
+    return res.json() as Promise<(Travel & { Reservation: Reservation[] })[]>;
   } catch (error) {
     console.error(error);
   }
 };
 
 const AdminPage = () => {
-  const [travels, setTravels] = useState<Travel[] | null>(null);
+  const [travels, setTravels] = useState<
+    (Travel & { Reservation: Reservation[] })[] | null
+  >(null);
 
   useEffect(() => {
     getTravels()
@@ -30,36 +33,39 @@ const AdminPage = () => {
       });
   }, []);
 
-  const columns: ColumnsTableProps<Travel>[] = [
-    {
-      name: "Cooperative",
-      selector: (row) => row.cooperative,
-    },
-    {
-      name: "Départ",
-      selector: (row) => row.departure,
-    },
-    {
-      name: "Arrivé",
-      selector: (row) => row.arrival,
-    },
-    {
-      name: "Date et heure de départ",
-      selector: (row) => row.departureDate + " " + row.departureTime,
-    },
-    {
-      name: "Maximum place",
-      selector: (row) => row.maxPlace,
-    },
-    {
-      name: "Place disponible",
-      selector: (row) => row.availablePlace!,
-    },
-    {
-      name: "Frais de transport",
-      selector: (row) => formatMoney(row.price) + " MGA",
-    },
-  ];
+  const columns: ColumnsTableProps<Travel & { Reservation: Reservation[] }>[] =
+    [
+      {
+        name: "Cooperative",
+        selector: (row) => row.cooperative,
+      },
+      {
+        name: "Départ",
+        selector: (row) => row.departure,
+      },
+      {
+        name: "Arrivé",
+        selector: (row) => row.arrival,
+      },
+      {
+        name: "Date et heure de départ",
+        selector: (row) => row.departureDate + " " + row.departureTime,
+      },
+      {
+        name: "Maximum place",
+        selector: (row) => row.maxPlace,
+      },
+      {
+        name: "Place disponible",
+        selector: (row) => row.maxPlace - countReservations(row.Reservation),
+      },
+      {
+        name: "Frais de transport",
+        selector: (row) => formatMoney(row.price) + " MGA",
+      },
+    ];
+
+  console.log(travels);
 
   return (
     <div className="p-4 pt-0">

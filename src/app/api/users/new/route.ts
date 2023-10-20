@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const { name, firstName, cin, telNumber, email, password } =
       await request.json();
 
-    prismaClient.$connect();
+    await prismaClient.$connect();
     const userAlreadyExist = await prismaClient.user.findUnique({
       where: {
         email: email,
@@ -66,6 +66,6 @@ export async function POST(request: Request) {
       status: errorResponse.ERR_INTERNAL_SERVER_ERROR.status,
     });
   } finally {
-    prismaClient.$disconnect();
+    await prismaClient.$disconnect();
   }
 }

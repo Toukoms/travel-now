@@ -6,6 +6,7 @@ import { Travel } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { RiArrowLeftRightFill } from "react-icons/ri";
 
 type Reservation = {
   userId: string;
@@ -27,6 +28,20 @@ const getTravelById = async (travelId: string) => {
   }
 };
 
+const updateTravel = async (reservationId: string, travelId: string) => {
+  try {
+    const res = await fetch(TRAVELS_ROUTE + `/${travelId}`, {
+      method: "put",
+      body: JSON.stringify({ reservationId: reservationId }),
+    });
+    if (res.ok && res.status === 200) {
+      console.log("Success updating travel");
+    }
+  } catch (error) {
+    console.error();
+  }
+};
+
 const ReservaTionPage = ({ params }: { params: { travelId: string } }) => {
   const session = useSession();
   const [travel, setTravel] = useState<Travel>();
@@ -44,7 +59,10 @@ const ReservaTionPage = ({ params }: { params: { travelId: string } }) => {
   useEffect(() => {
     getTravelById(params.travelId)
       .then((travel) => setTravel(travel))
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        throw new Error(err.message);
+      });
   }, [params.travelId]);
 
   useEffect(() => {
@@ -78,8 +96,12 @@ const ReservaTionPage = ({ params }: { params: { travelId: string } }) => {
           body: JSON.stringify(reservation),
         });
         if (res.ok && res.status === 201) {
+          // const reservationCreated = await res.json();
+          // await updateTravel(reservationCreated.id, params.travelId);
           setSuccess(true);
+          // router.push("/reservations");
         } else {
+          setError("Reservation échoué.");
         }
       } catch (error) {
         console.error();
@@ -92,13 +114,24 @@ const ReservaTionPage = ({ params }: { params: { travelId: string } }) => {
         );
     }
     setLoading(false);
+    if (error) {
+      setSuccess(false);
+    } else {
+      setSuccess(true);
+    }
   };
 
   console.log(reservation);
-  console.log(travel!);
 
   return (
     <div className="px-8 py-4 max-w-lg">
+      <div className="w-full flex justify-between items-center gap-4 mb-4 flex-wrap">
+        <div className="flex gap-2 items-baseline">
+          <h2 className="text-xl font-bold">{travel.departure}</h2>
+          <RiArrowLeftRightFill />
+          <h2 className="text-xl font-bold">{travel.arrival}</h2>
+        </div>
+      </div>
       <CardBooking travel={travel} reservationBtn={false}></CardBooking>
       <form className="mt-6" onSubmit={handleSubmit}>
         <h2 className="text-2xl mb-3">

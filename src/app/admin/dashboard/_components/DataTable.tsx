@@ -1,4 +1,5 @@
-import { Travel } from "@prisma/client";
+import { Reservation, Travel } from "@prisma/client";
+import Link from "next/link";
 import React from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
@@ -10,8 +11,8 @@ export type ColumnsTableProps<T> = {
 };
 
 type TableProps = {
-  data: Travel[];
-  columns: ColumnsTableProps<Travel>[];
+  data: (Travel & { Reservation: Reservation[] })[];
+  columns: ColumnsTableProps<Travel & { Reservation: Reservation[] }>[];
 };
 
 const DataTable = (props: TableProps) => {
@@ -57,21 +58,23 @@ const DataTable = (props: TableProps) => {
                 ))}
                 {/* Edit and Delete button */}
                 <td className="flex gap-1 px-8 py-1 justify-center items-center">
-                  <button
-                    type="button"
-                    className={twMerge("btn btn-sky", "text-sm p-2 px-3")}
+                  <Link
+                    href={`/admin/travel/reservation/${row.id}`}
+                    className={twMerge(
+                      "btn btn-sky",
+                      "text-sm p-2 px-3 whitespace-nowrap"
+                    )}
                   >
-                    <MdEdit size={16} />
-                    Edit
-                  </button>
+                    Liste de réservation
+                  </Link>
 
-                  <button
-                    type="button"
+                  {/* <Link
+                    href={`/admin/travel/delete/${row.id}`}
                     className={twMerge("btn btn-danger", "text-sm p-2 px-3")}
                   >
                     <MdDelete size={16} />
-                    Delete
-                  </button>
+                    Supprimer
+                  </Link> */}
                 </td>
               </tr>
             ))}
